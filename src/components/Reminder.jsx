@@ -145,10 +145,10 @@ const makeGetReferencedMessages = (getReminder) => {
 const makeMapStateToProps = () => {
   const getReminder = makeGetReminder()
   const getReferencedMessages = makeGetReferencedMessages(getReminder)
-  const mapStateToProps = ({ reminders, channels, users, referencedMessages }, {id}) => {
+  const mapStateToProps = ({ reminders, channels, users, referencedMessages, channelsLoaded }, {id}) => {
     let reminder = getReminder({reminders, id})
     return {
-      channels_loaded: !!channels.length,
+      channels_loaded: channelsLoaded,
       users,
       ...reminder,
       referencedMessages: getReferencedMessages({ reminders, id, referencedMessages })

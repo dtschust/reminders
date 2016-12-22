@@ -112,6 +112,12 @@ const promptForToken = createReducer({
     resolve: null
   })
 
+const channelsLoaded = createReducer({
+  [Actions.channelsLoaded]: (state, payload) => {
+    return true
+  }
+}, false)
+
 const rootReducer = combineReducers({
   alerts,
   reminders,
@@ -119,7 +125,8 @@ const rootReducer = combineReducers({
   usersToFetch,
   referencedMessages,
   users,
-  promptForToken
+  promptForToken,
+  channelsLoaded
 })
 
 export default rootReducer

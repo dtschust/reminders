@@ -39,6 +39,7 @@ export const reminderCompleted = createAction('completed reminder')
 
 export const promptForToken = createAction('request a token from the user')
 export const loadToken = createAction('load a token')
+export const channelsLoaded = createAction('all channels are loaded now')
 
 export const fetchAllThings = function () {
   return (dispatch) => {
@@ -56,10 +57,14 @@ export const fetchAllThings = function () {
       promise = Promise.resolve()
     }
     promise.then(() => {
-      dispatch(fetchReminders())
-      dispatch(fetchChannels())
-      dispatch(fetchGroups())
-      dispatch(fetchMpims())
+      let promises = []
+      promises.push(dispatch(fetchReminders()))
+      promises.push(dispatch(fetchChannels()))
+      promises.push(dispatch(fetchGroups()))
+      promises.push(dispatch(fetchMpims()))
+      Promise.all(promises).then(() => {
+        dispatch(channelsLoaded())
+      })
     })
   }
 }
