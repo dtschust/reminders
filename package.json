@@ -6,6 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=development babel-node index.js",
     "static": "NODE_ENV=production webpack --inline --progress --colors --config webpack.config.js",
+    "bundle-size": "NODE_ENV=production webpack --config webpack.config.js --json | webpack-bundle-size-analyzer",
     "start-static": "npm run static && cd public && live-server",
     "publish-gh-pages": "npm run static && ./scripts/publish-gh-pages.js",
     "test": "standard --verbose"
@@ -57,6 +58,7 @@
     "standard": "^8.0.0",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.2",
+    "webpack-bundle-size-analyzer": "^2.2.0",
     "webpack-dev-middleware": "^1.8.1",
     "webpack-dev-server": "^1.15.0",
     "webpack-hot-middleware": "^2.12.2"
