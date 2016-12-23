@@ -7,6 +7,8 @@ import Home from './routes/Home'
 import store from './redux/configureStore'
 import { fetchUsers } from './redux/actions'
 import './styles/index.less'
+require('es6-promise').polyfill()
+require('isomorphic-fetch')
 
 // periodically fetch unknown users
 setInterval(() => {
