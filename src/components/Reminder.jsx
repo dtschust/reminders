@@ -108,10 +108,16 @@ const Reminder = React.createClass({
 
   render: function () {
     let {text, time} = this.props
+    let referencedMessageText = _.get(this.props, 'referencedMessages[0].text');
+    let omnifocusUrl = `omnifocus:///add?name=${encodeURI(text)}`
+    if (referencedMessageText) {
+      omnifocusUrl += `&note=${encodeURI(referencedMessageText)}`
+    }
     return (
       <Paper style={{margin: '20px', padding: '20px'}} zDepth={1}>
         <FlatButton onClick={this.complete} label='Try to complete' primary />
         <FlatButton onClick={this.delete} label='Try to delete' secondary />
+        <FlatButton style={{float: 'right'}} href={omnifocusUrl} label='+ Omnifocus' primary />
         <h2 dangerouslySetInnerHTML={{__html: buildMessageHTML(text, this.props.users, this.props.addUserToFetch)}} />
         {this.props.referencedMessages.map(this.renderMessage)}
         <h3 title={moment(time * 1000).format('dddd, MMMM Do YYYY, h:mm:ss a')}>{`originally due ${moment(time * 1000).fromNow()} (I don't do snoozes)`}</h3>
