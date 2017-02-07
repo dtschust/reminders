@@ -93,7 +93,7 @@ const Reminder = React.createClass({
       let user = this.props.users[message.user]
       if (!user) {
         _.defer(() => {
-          this.props.addUserToFetch(message.user)
+          message.user && this.props.addUserToFetch(message.user)
         })
         user = message.user
       }
