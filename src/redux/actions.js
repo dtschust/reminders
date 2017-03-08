@@ -249,6 +249,9 @@ export const fetchMessages = function (reminderId, text) {
       // get CID
       let channel = getState().channels.find(({name}) => name === channelName)
       if (!channel) {
+      channel = getState().channels.find(({id}) => id === channelName)
+      }
+      if (!channel) {
         fetchMessage(dispatch, getState, reminderId, channelName, time, url, 'im.history')
       } else {
         let endpoint = 'channels.history'
