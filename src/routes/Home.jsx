@@ -46,6 +46,15 @@ const Home = React.createClass({
     this.state.token.length && this.props.loadToken(this.state.token)
   },
 
+  refetchChannels: function () {
+    const token = localStorage.getItem('token')
+    Object.keys(localStorage).forEach((key) => {
+    localStorage.clear(key)
+    })
+    localStorage.setItem('token', token)
+    this.props.fetchAllThings()
+  },
+
   render: function () {
     if (this.props.promptForToken) {
       return (
@@ -63,6 +72,7 @@ const Home = React.createClass({
         {this.props.reminderIds.map(this.renderReminder)}
         {this.props.reminderIds.length === 0 ? (<h3>No reminders, great job!</h3>) : null}
         {this.renderAlert()}
+        <RaisedButton label='(Refetch data)' onClick={this.refetchChannels} />
       </div>
     )
   }
