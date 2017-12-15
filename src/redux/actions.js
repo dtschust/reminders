@@ -241,7 +241,7 @@ export const fetchMessage = function (dispatch, getState, reminderId, channel, t
 export const fetchMessages = function (reminderId, text) {
   return (dispatch, getState) => {
     let promises = []
-    let regex = /(?:https:\/\/tinyspeck.slack.com\/archives\/)(.*?)\/p(\d*\w?\/?)/g
+    let regex = /(?:https:\/\/.*.slack.com\/archives\/)(.*?)\/p(\d*\w?\/?)/g
     let match = regex.exec(text)
     while (match) {
       let [ url, channelName, time ] = match
