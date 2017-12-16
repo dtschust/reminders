@@ -1,8 +1,6 @@
 /* global fetch, localStorage */
 import { createAction } from 'redux-act'
 
-let TOKEN
-
 export const loadingReminders = createAction('loading reminders')
 export const loadingRemindersError = createAction('error loading reminders')
 export const receivedReminders = createAction('received reminders')
@@ -37,35 +35,38 @@ export const completingReminder = createAction('completing a reminder')
 export const completingReminderError = createAction('error completing reminder')
 export const reminderCompleted = createAction('completed reminder')
 
-export const promptForToken = createAction('request a token from the user')
-export const loadToken = createAction('load a token')
 export const channelsLoaded = createAction('all channels are loaded now')
 
+export const storeToken = createAction('store the token')
+
 export const fetchAllThings = function () {
-  return (dispatch) => {
-    TOKEN = localStorage.getItem('token')
-    let promise
-    if (!TOKEN) {
-      promise = new Promise((resolve) => {
-        dispatch(promptForToken(resolve))
-      })
-      promise.then((token) => {
-        TOKEN = token
-        localStorage.setItem('token', token)
-      })
-    } else {
-      promise = Promise.resolve()
+  return (dispatch, getState) => {
+    const { token } = getState();;
+    if (!token) {
+      return;
     }
-    promise.then(() => {
-      let promises = []
-      promises.push(dispatch(fetchReminders()))
-      promises.push(dispatch(fetchChannels()))
-      promises.push(dispatch(fetchGroups()))
-      promises.push(dispatch(fetchMpims()))
-      Promise.all(promises).then(() => {
-        dispatch(channelsLoaded())
-      })
+    let promise
+    // if (!TOKEN) {
+    //   promise = new Promise((resolve) => {
+    //     dispatch(promptForToken(resolve))
+    //   })
+    //   promise.then((token) => {
+    //     TOKEN = token
+    //     localStorage.setItem('token', token)
+    //   })
+    // } else {
+    //   promise = Promise.resolve()
+    // }
+    // promise.then(() => {
+    let promises = []
+    promises.push(dispatch(fetchReminders()))
+    promises.push(dispatch(fetchChannels()))
+    promises.push(dispatch(fetchGroups()))
+    promises.push(dispatch(fetchMpims()))
+    Promise.all(promises).then(() => {
+      dispatch(channelsLoaded())
     })
+    // })
   }
 }
 
@@ -73,9 +74,10 @@ export const createAlert = createAction('create an alert')
 export const clearAlert = createAction('clear alert')
 
 export const completeReminder = function (id) {
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    const { token } = getState();;
     dispatch(completingReminder(id))
-    return fetch(`https://slack.com/api/reminders.complete?token=${TOKEN}&reminder=${id}`, {
+    return fetch(`https://slack.com/api/reminders.complete?token=${token}&reminder=${id}`, {
       method: 'GET'
     }).then(function (response) {
       return response.json()
@@ -96,9 +98,10 @@ export const completeReminder = function (id) {
 }
 
 export const deleteReminder = function (id) {
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    const { token } = getState();;
     dispatch(deletingReminder(id))
-    return fetch(`https://slack.com/api/reminders.delete?token=${TOKEN}&reminder=${id}`, {
+    return fetch(`https://slack.com/api/reminders.delete?token=${token}&reminder=${id}`, {
       method: 'GET'
     }).then(function (response) {
       return response.json()
@@ -133,12 +136,12 @@ const sortReminders = (reminders) => {
 export const fetchUsers = function () {
   return (dispatch, getState) => {
     dispatch(loadingUsers())
-    let { usersToFetch } = getState()
+    let { usersToFetch, token } = getState()
     if (!usersToFetch.length) {
       return
     }
 
-    return fetch(`https://slack.com/api/users.info?token=${TOKEN}&users=${usersToFetch.join(',')}`, {
+    return fetch(`https://slack.com/api/users.info?token=${token}&users=${usersToFetch.join(',')}`, {
       method: 'GET'
     }).then(function (response) {
       return response.json()
@@ -152,21 +155,22 @@ export const fetchUsers = function () {
 }
 
 export const fetchChannels = function () {
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    const { token } = getState();
     dispatch(loadingChannels())
-    let channels = localStorage.getItem('channels')
+    let channels = localStorage.getItem(token + 'channels')
     if (channels) {
       dispatch(receivedChannels(JSON.parse(channels)))
       return Promise.resolve()
     }
 
-    return fetch(`https://slack.com/api/channels.list?token=${TOKEN}&exclude_members=true`, {
+    return fetch(`https://slack.com/api/channels.list?token=${token}&exclude_members=true`, {
       method: 'GET'
     }).then(function (response) {
       return response.json()
     }).then(({channels}) => {
       dispatch(receivedChannels(channels))
-      localStorage.setItem('channels', JSON.stringify(channels))
+      localStorage.setItem(token + 'channels', JSON.stringify(channels))
     }).catch(function () {
       console.error(arguments)
       dispatch(loadingChannelsError())
@@ -175,21 +179,22 @@ export const fetchChannels = function () {
 }
 
 export const fetchMpims = function () {
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    const { token } = getState();
     dispatch(loadingMpims())
-    let mpims = localStorage.getItem('mpims')
+    let mpims = localStorage.getItem(token + 'mpims')
     if (mpims) {
       dispatch(receivedMpims(JSON.parse(mpims)))
       return Promise.resolve()
     }
 
-    return fetch(`https://slack.com/api/mpim.list?token=${TOKEN}&exclude_members=true`, {
+    return fetch(`https://slack.com/api/mpim.list?token=${token}&exclude_members=true`, {
       method: 'GET'
     }).then(function (response) {
       return response.json()
     }).then(({groups}) => {
       dispatch(receivedMpims(groups))
-      localStorage.setItem('mpims', JSON.stringify(groups))
+      localStorage.setItem(token + 'mpims', JSON.stringify(groups))
     }).catch(function () {
       console.error(arguments)
       dispatch(loadingMpimsError())
@@ -198,21 +203,22 @@ export const fetchMpims = function () {
 }
 
 export const fetchGroups = function () {
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    const { token } = getState();
     dispatch(loadingGroups())
-    let groups = localStorage.getItem('groups')
+    let groups = localStorage.getItem(token + 'groups')
     if (groups) {
       dispatch(receivedGroups(JSON.parse(groups)))
       return Promise.resolve()
     }
 
-    return fetch(`https://slack.com/api/groups.list?token=${TOKEN}&exclude_members=true`, {
+    return fetch(`https://slack.com/api/groups.list?token=${token}&exclude_members=true`, {
       method: 'GET'
     }).then(function (response) {
       return response.json()
     }).then(({groups}) => {
       dispatch(receivedGroups(groups))
-      localStorage.setItem('groups', JSON.stringify(groups))
+      localStorage.setItem(token + 'groups', JSON.stringify(groups))
     }).catch(function () {
       console.error(arguments)
       dispatch(loadingGroupsError())
@@ -221,12 +227,12 @@ export const fetchGroups = function () {
 }
 
 export const fetchMessage = function (dispatch, getState, reminderId, channel, time, url, endpoint = 'channels.history') {
-  let { referencedMessages } = getState()
+  let { referencedMessages, token } = getState()
   if (referencedMessages[time] && (referencedMessages[time].fetching || referencedMessages[time].fetched)) {
     return
   }
   dispatch(loadingMessage({reminderId, time}))
-  return fetch(`https://slack.com/api/${endpoint}?token=${TOKEN}&channel=${channel}&inclusive=1&latest=${time}&oldest=${time}`, {
+  return fetch(`https://slack.com/api/${endpoint}?token=${token}&channel=${channel}&inclusive=1&latest=${time}&oldest=${time}`, {
     method: 'GET'
   }).then(function (response) {
     return response.json()
@@ -271,9 +277,10 @@ export const fetchMessages = function (reminderId, text) {
 }
 
 export const fetchReminders = function () {
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    const { token } = getState();
     dispatch(loadingReminders())
-    return fetch(`https://slack.com/api/reminders.list?token=${TOKEN}`, {
+    return fetch(`https://slack.com/api/reminders.list?token=${token}`, {
       method: 'GET'
     }).then(function (response) {
       return response.json()

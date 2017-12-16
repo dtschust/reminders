@@ -4,6 +4,12 @@ import { createReducer } from 'redux-act'
 import _ from 'lodash'
 import * as Actions from './actions'
 
+const token = createReducer({
+  [Actions.storeToken]: (state, payload) => {
+    return payload;
+  }
+}, null);
+
 const reminders = createReducer({
   [Actions.receivedReminders]: (state, payload) => {
     return payload.filter(({complete_ts}) => !complete_ts)
@@ -98,19 +104,19 @@ const alerts = createReducer({
   }
 }, '')
 
-const promptForToken = createReducer({
-  [Actions.promptForToken]: (state, resolve) => {
-    return { resolve }
-  },
-  [Actions.loadToken]: (state, payload) => {
-    state.resolve(payload)
-    return { resolve: null }
-  }
+// const promptForToken = createReducer({
+//   [Actions.promptForToken]: (state, resolve) => {
+//     return { resolve }
+//   },
+//   [Actions.loadToken]: (state, payload) => {
+//     state.resolve(payload)
+//     return { resolve: null }
+//   }
 
-},
-  {
-    resolve: null
-  })
+// },
+//   {
+//     resolve: null
+//   })
 
 const channelsLoaded = createReducer({
   [Actions.channelsLoaded]: (state, payload) => {
@@ -125,8 +131,9 @@ const rootReducer = combineReducers({
   usersToFetch,
   referencedMessages,
   users,
-  promptForToken,
-  channelsLoaded
+  // promptForToken,
+  channelsLoaded,
+  token,
 })
 
 export default rootReducer

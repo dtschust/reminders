@@ -3,25 +3,18 @@ import { connect } from 'react-redux'
 import Snackbar from 'material-ui/Snackbar'
 import RaisedButton from 'material-ui/RaisedButton'
 import TextField from 'material-ui/TextField'
-import { fetchAllThings, loadToken } from '../redux/actions'
+import { fetchAllThings } from '../redux/actions'
 import Reminder from '../components/Reminder'
 
 const Home = React.createClass({
   displayName: 'Home',
   propTypes: {
+    token: React.PropTypes.string.isRequired,
     fetchAllThings: React.PropTypes.func.isRequired,
-    loadToken: React.PropTypes.func.isRequired,
-    promptForToken: React.PropTypes.bool.isRequired
   },
 
   componentDidMount: function () {
     this.props.fetchAllThings()
-  },
-
-  getInitialState: function () {
-    return {
-      token: ''
-    }
   },
 
   renderReminder: function (id) {
@@ -41,34 +34,25 @@ const Home = React.createClass({
     }
   },
 
-  loadToken: function (e) {
-    e.preventDefault()
-    this.state.token.length && this.props.loadToken(this.state.token)
-  },
-
   refetchChannels: function () {
-    const token = localStorage.getItem('token')
+    const tokens = localStorage.getItem('tokens');
     Object.keys(localStorage).forEach((key) => {
     localStorage.clear(key)
     })
-    localStorage.setItem('token', token)
+    localStorage.setItem('tokens', tokens)
     this.props.fetchAllThings()
   },
 
   render: function () {
-    if (this.props.promptForToken) {
+    if (!this.props.token) {
       return (
         <div>
           <h1>Hey gimme a token!</h1>
-          <form onSubmit={this.loadToken}>
-            <TextField fullWidth hintText='insert token here' value={this.state.token} onChange={(e) => this.setState({token: e.target.value})} />
-            <RaisedButton label='Go' type='submit' primary />
-          </form>
         </div>
       )
     }
     return (
-      <div>
+      <div style={{ border: '1px solid gray' }} >
         {this.props.reminderIds.map(this.renderReminder)}
         {this.props.reminderIds.length === 0 ? (<h3>No reminders, great job!</h3>) : null}
         {this.renderAlert()}
@@ -78,14 +62,14 @@ const Home = React.createClass({
   }
 })
 
-const mapStateToProps = ({ reminders, alerts, promptForToken }) => {
+const mapStateToProps = ({ token, reminders, alerts, promptForToken }) => {
   return {
     reminderIds: reminders.map(({id}) => id),
     alerts,
-    promptForToken: !!promptForToken.resolve
+    token,
   }
 }
 
-const mapDispatchToProps = { fetchAllThings, loadToken }
+const mapDispatchToProps = { fetchAllThings }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)
