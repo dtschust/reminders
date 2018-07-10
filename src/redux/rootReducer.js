@@ -90,7 +90,7 @@ const referencedMessages = createReducer({
     return {...state, [time]: { fetching: true }}
   },
   [Actions.loadingMessageError]: (state, {time}) => {
-    return {...state, [time]: { fetching: false }}
+    return {...state, [time]: { fetching: false, notFound: true }}
   }
 },
 {})

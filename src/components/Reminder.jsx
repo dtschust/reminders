@@ -89,6 +89,12 @@ const Reminder = React.createClass({
   renderMessage: function (message, i) {
     if (message.fetching) {
       return (<CircularProgress key={i} />)
+    } else if (message && message.notFound) {
+      return (
+        <Paper key={i} style={{margin: '20px', padding: '20px'}} zDepth={1}>
+          <div>(message can't be fetched for some reason)</div>
+        </Paper>
+      )
     } else if (message && message.text) {
       let user = this.props.users[message.user]
       if (!user) {

@@ -246,12 +246,24 @@ export const fetchMessage = function (dispatch, getState, reminderId, channel, t
 
 export const fetchMessages = function (reminderId, text) {
   return (dispatch, getState) => {
+    const state = getState();
     let promises = []
     let regex = /(?:https:\/\/.*.slack.com\/archives\/)(.*?)\/p(\d*\w?\/?)/g
     let match = regex.exec(text)
     while (match) {
       let [ url, channelName, time ] = match
       time = `${time.slice(0, time.length - 6)}.${time.slice(-6)}`
+
+      if (state && state.referencedMessages && state.referencedMessages[time] && state.referencedMessages[time].notFound) {
+        // Message can't be found, give up!
+        match = regex.exec(text)
+        continue;
+      } else if (state && state.referencedMessages && state.referencedMessages[time]) {
+        // Already fetched message, nothing to do
+        match = regex.exec(text)
+        continue;
+
+      }
       // get CID
       let channel = getState().channels.find(({name}) => name === channelName)
       if (!channel) {
